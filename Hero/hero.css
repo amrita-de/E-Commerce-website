@@ -1,0 +1,42 @@
+.hero {
+    position: relative;
+    padding-left: 55px;
+  }
+  
+  .hero-latest-btn {
+    position: absolute;
+    top: 67%;
+    left: 25%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    width: 310px;
+    height: 70px;
+    border-radius: 75px;
+    font-size: 25px;
+    font-weight: 500;
+    background-color: red;
+    z-index: 1; 
+  }
+  
+  .hand-hand-icon {
+    position: relative;
+  }
+  
+  .hand-hand-icon img {
+    width: 100%; /* Ensure the image fills its container */
+  }
+  
+  .front_temp2 {
+    position: relative;
+  }
+  
+  .front_temp2 img {
+    
+    height: auto; /* Maintain aspect ratio */
+    object-fit: cover; /* Ensure the image covers its container */
+    border-radius: inherit; /* Inherit border radius from the container */
+  }
+  

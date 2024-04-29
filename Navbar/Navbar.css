@@ -1,0 +1,67 @@
+ .navbar{
+    display: flex;
+    justify-content: space-around;
+    padding: 16px;
+    box-shadow: 0 1px 3px -2px black;
+ }
+ .nav-logo{
+    display:flex;
+    align-items: center;
+    gap: 10px;
+    font-size:30px ;
+    font-weight: 600;
+ }
+ .nav-menu{
+display: flex;
+align-items: center !important;
+list-style: none;
+gap: 50px;
+font-size: 20px;
+font-weight: 500;
+ }
+ .nav-menu li{
+    display: flex !important;
+    flex-direction: column;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 3px;
+    cursor: pointer;
+    
+ }
+ .nav-menu hr{
+   border: none;
+   width: 80%;
+   height: 3px;
+   border-radius: 10px;
+   background-color: red;
+   align-items: center;
+ }
+ .nav-login-cart{
+   display: flex;
+   align-items: center;
+   gap: 45px;
+   justify-content: space-around;
+ }
+ 
+/* Override styles for ul.Nav-menu */
+ul.Nav-menu {
+   /* Add your custom styles here */
+   display: flex; /* Example: Change display property */
+   gap: 20px; /* Example: Change gap property */
+   list-style: none; /* Example: Change list-style property */
+   align-items: center;
+}
+.nav-cart-count{
+   width: 22px;
+   height: 22px;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   margin-top: -35px;
+   margin-left: -55px;
+   border-radius: 11px;
+   font-size: 14px;
+   background-color: red;
+   color: white;
+}
+
