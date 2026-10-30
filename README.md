@@ -53,3 +53,9 @@ The central core handling logic, security, and persistence.
 * MongoDB Atlas account or local MongoDB server.
 
 
+
+## Running locally
+
+Backend (repo root): copy `.env.example` to `.env`, set `MONGODB_URI`, `JWT_SECRET` and `ADMIN_EMAILS`, then `npm install && npm start` (port 4000). `npm test` runs the API test suite.
+
+Frontend (`frontend/`): `cd frontend && npm install && npm run dev`. It expects the backend on port 4000. Admin screens live under `/admin` and require an account whose email is in `ADMIN_EMAILS`.
