@@ -32,6 +32,7 @@ const AddProduct = () => {
         method: 'POST',
         headers: {
           Accept: 'application/json',
+          'auth-token': localStorage.getItem('auth-token') || '',
         },
         body: formData,
       });
@@ -47,6 +48,7 @@ const AddProduct = () => {
           headers: {
             'Content-Type': 'application/json',
             Accept: 'application/json',
+            'auth-token': localStorage.getItem('auth-token') || '',
           },
           body: JSON.stringify(product),
         });
