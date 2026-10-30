@@ -1,7 +1,7 @@
 import React from 'react'
 import './Navbar.css'
-import logo from '../../assets/logo.jpg'
-import navProfile from '../../assets/navProfile.jpg'
+import logo from './Assets/logo.jpg'
+import navProfile from './Assets/navProfile.jpg'
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 

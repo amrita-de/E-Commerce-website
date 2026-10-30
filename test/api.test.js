@@ -1,6 +1,7 @@
 // Integration tests for the E-Commerce backend.
 // Uses an in-memory MongoDB so no real database or credentials are needed.
 process.env.JWT_SECRET = "test-secret-for-ci";
+process.env.ADMIN_EMAILS = "t@example.com";
 process.env.NODE_ENV = "test";
 
 const { MongoMemoryServer } = require("mongodb-memory-server");
@@ -84,11 +85,16 @@ const post = async (path, body, token) => {
   cart = await post("/getcart", {}, token);
   check("cart persists remove operation", cart.data["5"] === 1);
 
-  // 6. Product endpoints: add requires auth, list is public, remove requires auth
+  // 6. Product endpoints: add needs ADMIN auth, list is public, remove needs admin
   const addAnon = await post("/addproduct", { name: "Kurta", image: "img", category: "women", new_price: 20, old_price: 30 });
   check("addproduct rejects unauthenticated request", addAnon.status === 401);
+  const shopperSignup = await post("/signup", { username: "Shopper", email: "shopper@example.com", password: "pw12345" });
+  const addShopper = await post("/addproduct", { name: "Kurta", image: "img", category: "women", new_price: 20, old_price: 30 }, shopperSignup.data.token);
+  check("addproduct rejects a logged-in non-admin (403)", addShopper.status === 403);
+  const removeShopper = await post("/removeproduct", { id: 1 }, shopperSignup.data.token);
+  check("removeproduct rejects a logged-in non-admin (403)", removeShopper.status === 403);
   const add = await post("/addproduct", { name: "Kurta", image: "img", category: "women", new_price: 20, old_price: 30 }, token);
-  check("addproduct works with token", add.data.success === true);
+  check("addproduct works for an admin token", add.data.success === true);
   const list = await (await fetch(base + "/allproducts")).json();
   check("allproducts lists the added product", Array.isArray(list) && list.length === 1 && list[0].name === "Kurta" && list[0].id === 1);
   const add2 = await post("/addproduct", { name: "Shirt", image: "img", category: "men", new_price: 10, old_price: 15 }, token);

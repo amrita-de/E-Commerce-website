@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './AddProduct.css';
-import Upload_img from '../../assets/Upload_img.jpg';
+import Upload_img from './Assets/Upload_img.jpg';
 
 const AddProduct = () => {
   const [image, setImage] = useState(null);

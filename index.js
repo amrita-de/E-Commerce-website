@@ -17,14 +17,29 @@ const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/e-comm
 const JWT_SECRET =
   process.env.JWT_SECRET ||
   (() => {
-    // No secret in the environment: generate a random one for this process so
-    // nothing secret is ever committed. Existing tokens stop validating on
-    // restart, so set JWT_SECRET in the environment for persistent sessions.
+    if (process.env.NODE_ENV === "production") {
+      // Fail safe: refuse to start without a real secret instead of silently
+      // invalidating everyone's sessions on every restart.
+      throw new Error(
+        "JWT_SECRET is not set. Set it in the environment before starting in production."
+      );
+    }
+    // Development only: generate a random per-start secret so nothing secret
+    // is committed. Tokens stop validating on restart; set JWT_SECRET for
+    // persistent sessions.
     console.warn(
-      "JWT_SECRET is not set - using a random per-start secret. Set JWT_SECRET in your environment for sessions that survive restarts."
+      "JWT_SECRET is not set - using a random per-start secret (development only). Set JWT_SECRET in your environment for sessions that survive restarts."
     );
     return crypto.randomBytes(32).toString("hex");
   })();
+
+// Admin authorization: only these accounts may change products.
+// Comma-separated emails in ADMIN_EMAILS; product mutations are rejected
+// for everyone else until at least one admin email is configured.
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || "")
+  .split(",")
+  .map((e) => e.trim().toLowerCase())
+  .filter(Boolean);
 
 // Database Connection with mongodb
 mongoose
@@ -114,6 +129,17 @@ const fetchuser = (req, res, next) => {
   }
 };
 
+// Requires fetchuser first: confirms the authenticated account is an admin.
+const fetchadmin = async (req, res, next) => {
+  const user = await Users.findById(req.user.id);
+  if (!user || !ADMIN_EMAILS.includes(user.email.toLowerCase())) {
+    return res
+      .status(403)
+      .json({ success: false, errors: "Admin access required" });
+  }
+  next();
+};
+
 const isBcryptHash = (value) => typeof value === "string" && value.startsWith("$2");
 
 const signToken = (user) =>
@@ -182,7 +208,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 app.use("/images", express.static("upload/images"));
 
-app.post("/upload", fetchuser, upload.single("product"), (req, res) => {
+app.post("/upload", fetchuser, fetchadmin, upload.single("product"), (req, res) => {
   res.json({
     success: 1,
     img_url: `${req.protocol}://${req.get("host")}/images/${req.file.filename}`,
@@ -190,7 +216,7 @@ app.post("/upload", fetchuser, upload.single("product"), (req, res) => {
 });
 
 // Endpoint for adding a product (admin)
-app.post("/addproduct", fetchuser, async (req, res) => {
+app.post("/addproduct", fetchuser, fetchadmin, async (req, res) => {
   let products = await Product.find({});
   let id = products.length > 0 ? products.slice(-1)[0].id + 1 : 1;
   const product = new Product({
@@ -206,7 +232,7 @@ app.post("/addproduct", fetchuser, async (req, res) => {
 });
 
 // Endpoint for removing a product (admin)
-app.post("/removeproduct", fetchuser, async (req, res) => {
+app.post("/removeproduct", fetchuser, fetchadmin, async (req, res) => {
   await Product.findOneAndDelete({ id: req.body.id });
   res.json({ success: true, name: req.body.name });
 });
